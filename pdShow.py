@@ -29,8 +29,11 @@ import pandas as pd
 
 SW_VERSION='0.1'
 
-ConfigFile=[]
-SaveFileName='ScanData'
+SortData=1
+ZeroFilter=1
+fileName=''
+
+SaveFileName='' #'ScanData.txt'
 
 DefaultScanFileType=('.xlsx','.csv')
 DefaultCols=['xxx','Total']
@@ -60,12 +63,31 @@ class FileScan:
             if debugLog >= debugLogLevel[-1]:
                 print('Check: ',self.__filename,cols)
             
-            self.__df=fd[cols] 
+            if ZeroFilter:
+                if debugLog >= debugLogLevel[2]:
+                    print('Drop Zero Data!')
+                self.__df=fd[cols].dropna()
+            else:
+                self.__df=fd[cols]
+
+ 
+            if SortData:
+                if debugLog >= debugLogLevel[2]:
+                    print('Sort Data!')
+                self.__df=self.__df.sort_values(by=DefaultCols[-1])
+            
+            if debugLog >= debugLogLevel[2]:
+                print("Data: \n",self.__df)
 
         def __SaveFile(self,filename,data):
             if data:
-                f= filename+'.xlsx'
-                data.to_excel(f)                
+                if filename:
+                    fname = filename.split('.')[0] 
+                    f= fname+'.xlsx'
+                    data.to_excel(f)
+
+                    f= fname+'.jpg' 
+                    data.plot(x=DefaultCols[0],grid=True,rot=45,figsize=(15,15)).get_figure().savefig(f)  
 
                 if debugLog >= debugLogLevel[2]:
                     print( 'Save file: '+f)
@@ -224,8 +246,9 @@ def ScanDir(Dir):
         for entry in it:
             if not entry.name.startswith('.') and entry.is_file():
                 ScanFile(Dir,entry.name)
-
-    SaveData(SaveFileName,Datas)
+    
+    if SaveFileName:
+        SaveData(SaveFileName,Datas)
 
 
 def ParseArgv():
@@ -265,19 +288,19 @@ def ParseArgv():
 				else:
 					Usage()
 					sys.exit()
-			elif sys.argv[i] == '-c':
-				if sys.argv[i+1]:
-					global ConfigFile
-					ConfigFile = sys.argv[i+1]
-					print( 'ConfigFile is '+ConfigFile)
-				else:
-					Usage()
-					sys.exit()
+			elif sys.argv[i] == '-s':
+					global SortData
+					SortData = 1
+					print( 'Sort is ',SortData)
+			elif sys.argv[i] == '-z':
+					global ZeroFilter
+					ZeroFilter = 1
+					print( 'ZeroFilter is ',ZeroFilter)
 
 
 def Usage():
 	print( 'Command Format :')
-	print( '		CameraLogScan [-d 1/2/3] [-o outputfile] [-p path]  [-c configfile] [-z(unzip zip files)]| [-h]')
+	print( '		CameraLogScan [-d 1/2/3] [-o output excel file] [-p path]  [-s] [-z Filt zero data]| [-h]')
 
 appParaNum = 6
 
