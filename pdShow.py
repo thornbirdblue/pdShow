@@ -66,17 +66,17 @@ class FileScan:
             if ZeroFilter:
                 if debugLog >= debugLogLevel[2]:
                     print('Drop Zero Data!')
-                self.__df=fd[cols].dropna()
+                self.__df=self.__fd[cols].dropna()
             else:
-                self.__df=fd[cols]
+                self.__df=self.__fd[cols]
 
  
             if SortData:
                 if debugLog >= debugLogLevel[2]:
                     print('Sort Data!')
-                self.__df=self.__df.sort_values(by=DefaultCols[-1])
+                self.__df=self.__df.sort_values(by=DefaultCols[-1],ascending=False)
             
-            if debugLog >= debugLogLevel[2]:
+            if debugLog >= debugLogLevel[1]:
                 print("Data: \n",self.__df)
 
         def __SaveFile(self,filename,data):
@@ -85,7 +85,7 @@ class FileScan:
             else:
                 if filename:
                     fname = filename.split('.')[0] 
-                    f= fname+'.xlsx'
+                    f= fname+'_sel.xlsx'
                     data.to_excel(f)
 
                     f= fname+'.jpg' 
@@ -98,7 +98,7 @@ class FileScan:
             if debugLog >= debugLogLevel[-1]:
                 print( 'SaveToFile:')
 
-            self.__SaveFile(self.__filename,__self.__df)
+            self.__SaveFile(self.__filename,self.__df)
 
         def Dump(self):
             if debugLog >= debugLogLevel[-1]:
