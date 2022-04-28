@@ -80,7 +80,9 @@ class FileScan:
                 print("Data: \n",self.__df)
 
         def __SaveFile(self,filename,data):
-            if data:
+            if data.empty:
+               print('(ERROR) Data is NULL.')
+            else:
                 if filename:
                     fname = filename.split('.')[0] 
                     f= fname+'.xlsx'
@@ -91,9 +93,6 @@ class FileScan:
 
                 if debugLog >= debugLogLevel[2]:
                     print( 'Save file: '+f)
-            else:
-                if debugLog >= debugLogLevel[2]:
-                    print( '(WARN) Save File len is 0!')
 
         def SaveToFile(self,fd):
             if debugLog >= debugLogLevel[-1]:
@@ -204,7 +203,7 @@ def ScanFile(dirname,file):
                 if debugLog >= debugLogLevel[-1]:
                        print( 'INFO: open file :'+os.path.join(dirname,file))
 
-                fd = pd.read_exce(os.path.join(dirname,file),'rb')
+                fd = pd.read_excel(os.path.join(dirname,file))
                 FileCheck(dirname,file,fd)
 
                 #fd.close()
